@@ -1,0 +1,81 @@
+name: Release Android
+
+# Cutting a release is a single action: push a version tag (e.g. `v0.1.2`).
+# This builds a signed release APK and attaches it to a GitHub Release.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # needed to create the GitHub Release and upload the APK
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7 # keep in step with the local toolchain
+          cache: true
+
+      # The tag drives the version: `v0.1.2` -> versionName 0.1.2. The build
+      # number is the monotonic workflow run number so every release differs.
+      - name: Resolve version from tag
+        id: ver
+        run: echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+
+      - name: Write key.properties
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          {
+            echo "storePassword=$STORE_PASSWORD"
+            echo "keyPassword=$KEY_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "storeFile=upload-keystore.jks"
+          } > android/key.properties
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build signed release APK
+        run: >
+          flutter build apk --release
+          --build-name=${{ steps.ver.outputs.name }}
+          --build-number=${{ github.run_number }}
+
+      - name: Name the artifact after the tag
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             sarv-authenticator-${{ github.ref_name }}.apk
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sarv-authenticator-${{ github.ref_name }}.apk
+          generate_release_notes: true
+
+      # Secrets are written to the workspace as files; remove them even though the
+      # runner is ephemeral, so a later step can never read the signing material.
+      - name: Scrub signing material
+        if: always()
+        run: rm -f android/app/upload-keystore.jks android/key.properties
