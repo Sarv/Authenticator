@@ -1,0 +1,92 @@
+name: sarv_authenticator
+description: A clean-room TOTP/HOTP authenticator (Google Authenticator-compatible), themed with the sarv design system.
+publish_to: "none"
+version: 0.1.1+2
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # HMAC-SHA1/256/512 — never hand-roll crypto.
+  crypto: ^3.0.3
+  # OS-encrypted secret storage (Android Keystore / iOS Keychain).
+  flutter_secure_storage: ^9.2.2
+  # Camera QR scanning for otpauth:// enrollment. 7.x uses Apple's native Vision
+  # framework on iOS (no Google ML Kit), so the app builds arm64 and runs on
+  # Apple Silicon iOS simulators.
+  mobile_scanner: ^7.0.0
+  # Biometric / device-credential app lock.
+  local_auth: ^2.3.0
+  # Renders the brand SVG logo (theme-aware light/dark variants).
+  flutter_svg: ^2.0.10+1
+  # Vetted crypto for encrypted backups (AES-GCM-256 + PBKDF2) — never hand-rolled.
+  cryptography: ^2.7.0
+  # Encrypted export/import file I/O.
+  path_provider: ^2.1.4
+  share_plus: ^10.1.2
+  file_picker: ^8.1.4
+  # Note: screenshot/recording blocking is enforced natively via FLAG_SECURE in
+  # MainActivity (see android/.../MainActivity.kt), not a Flutter plugin.
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  # Generates platform launcher icons from the PNGs in assets/.
+  flutter_launcher_icons: ^0.14.1
+  # Branded native splash so the cold-start gap shows the logo, not a blank screen.
+  flutter_native_splash: ^2.4.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/authenticator-icon-light.svg
+    - assets/authenticator-icon-dark.svg
+  # Fonts mirror sarv_theme/fonts.css (Plus Jakarta Sans + JetBrains Mono).
+  # Drop the .ttf files into assets/fonts/ to bundle them offline; until then
+  # the app falls back to the platform sans/mono.
+  # fonts:
+  #   - family: PlusJakartaSans
+  #     fonts:
+  #       - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+  #       - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+  #         weight: 700
+  #   - family: JetBrainsMono
+  #     fonts:
+  #       - asset: assets/fonts/JetBrainsMono-Regular.ttf
+  #       - asset: assets/fonts/JetBrainsMono-SemiBold.ttf
+  #         weight: 600
+
+# Launcher icons — run `dart run flutter_launcher_icons` after `flutter pub get`.
+# Light theme uses the white-ground mark; Android 13+ themed/dark uses the dark
+# variant. Backgrounds come from the sarv surface tokens.
+# Native splash — brand surface background + the logo mark, light/dark aware.
+# Regenerate with: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFFFFF" # --surface (light)
+  color_dark: "#131826" # --surface (dark)
+  image: assets/adaptive-fg-light-1024.png
+  image_dark: assets/adaptive-fg-dark-1024.png
+  android_12:
+    color: "#FFFFFF"
+    color_dark: "#131826"
+    image: assets/adaptive-fg-light-1024.png
+    image_dark: assets/adaptive-fg-dark-1024.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon-light-1024.png"
+  adaptive_icon_background: "#FFFFFF"      # --surface (light)
+  adaptive_icon_foreground: "assets/adaptive-fg-light-1024.png"
+  # Android 13+ dark/themed variant:
+  background_color_dark: "#131826"         # --surface (dark)
+  adaptive_icon_background_dark: "#131826"
+  adaptive_icon_foreground_dark: "assets/adaptive-fg-dark-1024.png"
+  image_path_dark: "assets/icon-dark-1024.png"
+  remove_alpha_ios: true
