@@ -1,7 +1,11 @@
-# sarv Authenticator
+<p align="center">
+  <img src="assets/authenticator-icon.svg" alt="Sarv Authenticator" width="120" />
+</p>
+
+<h1 align="center">Sarv Authenticator</h1>
 
 A clean-room, **Google Authenticator-compatible** TOTP/HOTP app built with Flutter
-(Android + iOS from one codebase) and themed with the **sarv design system**.
+(Android + iOS from one codebase) and themed with the **Sarv design system**.
 
 It is not a copy of Google's app — it implements the two open standards Google
 Authenticator is built on, so it interoperates with every service that supports
@@ -10,6 +14,15 @@ Authenticator is built on, so it interoperates with every service that supports
 - **RFC 4226** — HOTP (HMAC-based one-time passwords)
 - **RFC 6238** — TOTP (time-based, the 30-second rolling codes)
 - **Key Uri Format** — the `otpauth://` URI a QR code encodes
+
+## Screenshots
+
+| Codes (light) | Codes (dark) | Settings | Add account |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/01-home-light.png" width="200" alt="Home screen, light theme" /> | <img src="docs/screenshots/02-home-dark.png" width="200" alt="Home screen, dark theme" /> | <img src="docs/screenshots/03-settings-light.png" width="200" alt="Settings: theme, app lock, backup" /> | <img src="docs/screenshots/04-add-light.png" width="200" alt="Add account: scan QR or enter a key" /> |
+
+> Codes shown are from demo accounts seeded for the screenshots — not live
+> secrets. On device, `FLAG_SECURE` blocks screenshots of real codes.
 
 ## How a code is produced (entirely offline, no network)
 
@@ -27,7 +40,7 @@ Authenticator is built on, so it interoperates with every service that supports
 | `lib/core/otpauth_uri.dart` | Parses the `otpauth://` QR payload |
 | `lib/data/account.dart` | Immutable account model + JSON |
 | `lib/data/account_store.dart` | Encrypted persistence (Keystore/Keychain) — the only I/O edge |
-| `lib/ui/theme.dart` | sarv design tokens → Flutter theme (the only file with literal values) |
+| `lib/ui/theme.dart` | Sarv design tokens → Flutter theme (the only file with literal values) |
 | `lib/ui/app_logo.dart` | Theme-aware brand mark (light/dark SVG variant) |
 | `lib/ui/auth_gate.dart` · `lock_screen.dart` | Biometric app-lock gate + lock UI |
 | `lib/ui/settings_screen.dart` · `passphrase_dialog.dart` | Settings — app-lock toggle + backup/restore |
@@ -40,14 +53,14 @@ Authenticator is built on, so it interoperates with every service that supports
 
 ## Biometric app-lock
 
-On launch (and every time the app returns from the background) `AuthGate` prompts
-for biometrics, falling back to the device PIN/pattern. It's **on by default**
-whenever the device supports it. Codes are never shown on an unattended, unlocked
-device.
+When enabled, `AuthGate` prompts for biometrics on launch (and every time the app
+returns from the background), falling back to the device PIN/pattern, so codes are
+never shown on an unattended, unlocked device. It is **off by default** — turn it
+on from the **Settings screen** (gear icon, top-right).
 
-Toggle it from the **Settings screen** (gear icon, top-right). Turning the lock
-*on* requires a successful auth first, so you can't lock yourself out with a
-credential that doesn't work; the change arms the gate on the next background.
+Turning the lock *on* requires a successful auth first, so you can't lock yourself
+out with a credential that doesn't work; the change arms the gate on the next
+background.
 
 ## Encrypted export / import
 
@@ -122,7 +135,7 @@ flutter run           # on a connected device/emulator
 **iOS** — add to `ios/Runner/Info.plist`:
 ```xml
 <key>NSFaceIDUsageDescription</key>
-<string>Unlock sarv Authenticator with Face ID</string>
+<string>Unlock Sarv Authenticator with Face ID to view your codes.</string>
 <key>NSCameraUsageDescription</key>
 <string>Scan QR codes to add authenticator accounts</string>
 ```
