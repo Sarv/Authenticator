@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rename an account's issuer and label without touching its secret.
 - Confirmation dialog before removing an account.
 - FLAG_SECURE / screenshot protection so codes do not leak into screenshots or the app switcher.
-- sarv-themed UI (design-system tokens) with light and dark app icons.
+- Sarv-themed UI (design-system tokens) with light and dark app icons.
 
 ### Security
 - Secrets are stored only in the OS-backed keystore (Android Keystore / iOS Keychain) — never in plain preferences, files, or over the network.

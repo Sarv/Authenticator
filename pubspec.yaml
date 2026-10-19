@@ -1,5 +1,5 @@
 name: sarv_authenticator
-description: A clean-room TOTP/HOTP authenticator (Google Authenticator-compatible), themed with the sarv design system.
+description: A clean-room TOTP/HOTP authenticator (Google Authenticator-compatible), themed with the Sarv design system.
 publish_to: "none"
 version: 0.1.1+2
 
@@ -64,7 +64,7 @@ flutter:
 
 # Launcher icons — run `dart run flutter_launcher_icons` after `flutter pub get`.
 # Light theme uses the white-ground mark; Android 13+ themed/dark uses the dark
-# variant. Backgrounds come from the sarv surface tokens.
+# variant. Backgrounds come from the Sarv surface tokens.
 # Native splash — brand surface background + the logo mark, light/dark aware.
 # Regenerate with: dart run flutter_native_splash:create
 flutter_native_splash:

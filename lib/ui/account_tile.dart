@@ -7,7 +7,7 @@ import '../data/account.dart';
 import 'theme.dart';
 
 /// One row in the codes list: avatar chip, issuer/account, the live 6-digit
-/// code, and a countdown ring — the Google Authenticator layout, sarv-themed.
+/// code, and a countdown ring — the Google Authenticator layout, Sarv-themed.
 /// Tapping copies the code; long-pressing opens the actions menu. Edit and
 /// delete are reached by swiping the row (wired by the list in home_screen).
 class AccountTile extends StatefulWidget {
