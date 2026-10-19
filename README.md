@@ -21,6 +21,12 @@ Authenticator is built on, so it interoperates with every service that supports
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/01-home-light.png" width="200" alt="Home screen, light theme" /> | <img src="docs/screenshots/02-home-dark.png" width="200" alt="Home screen, dark theme" /> | <img src="docs/screenshots/03-settings-light.png" width="200" alt="Settings: theme, app lock, backup" /> | <img src="docs/screenshots/04-add-light.png" width="200" alt="Add account: scan QR or enter a key" /> |
 
+Long-press a row for the actions menu; swipe to edit or delete:
+
+| Actions menu (long-press) | Swipe to edit / delete |
+|:---:|:---:|
+| <img src="docs/screenshots/05-menu-light.png" width="200" alt="Long-press actions menu: Rename or Remove" /> | <img src="docs/screenshots/06-swipe-light.png" width="200" alt="Swiping a row reveals the Edit action" /> |
+
 > Codes shown are from demo accounts seeded for the screenshots — not live
 > secrets. On device, `FLAG_SECURE` blocks screenshots of real codes.
 
