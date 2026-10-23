@@ -82,7 +82,7 @@ Future<List<Account>> decryptBackup(String envelopeJson, String passphrase) asyn
   }
 
   if (envelope['format'] != _backupFormat) {
-    throw const BackupDecryptException('Not a Sarv Authenticator backup');
+    throw const BackupDecryptException('Not a Sarv OTP backup');
   }
   if (envelope['version'] != _backupVersion) {
     throw BackupDecryptException('Unsupported backup version: ${envelope['version']}');

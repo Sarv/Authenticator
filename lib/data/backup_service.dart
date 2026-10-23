@@ -34,7 +34,7 @@ class BackupService {
 
     await Share.shareXFiles(
       [XFile(file.path, mimeType: 'application/json')],
-      subject: 'Sarv Authenticator backup',
+      subject: 'Sarv OTP backup',
     );
   }
 

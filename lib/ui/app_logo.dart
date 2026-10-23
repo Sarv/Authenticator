@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// The Sarv Authenticator brand mark, theme-aware: it renders the dark-token
+/// The Sarv OTP brand mark, theme-aware: it renders the dark-token
 /// variant under a dark theme and the brand variant otherwise. Both SVGs are
 /// the same artwork recoloured with the design system's light/dark tokens.
 class AppLogo extends StatelessWidget {

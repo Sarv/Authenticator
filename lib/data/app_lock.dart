@@ -73,7 +73,7 @@ class AppLock {
   Future<bool> authenticate() async {
     try {
       return await _auth.authenticate(
-        localizedReason: 'Unlock Sarv Authenticator to view your codes',
+        localizedReason: 'Unlock Sarv OTP to view your codes',
         options: const AuthenticationOptions(
           stickyAuth: true,
         ),

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/authenticator-icon.svg" alt="Sarv Authenticator" width="120" />
+  <img src="assets/authenticator-icon.svg" alt="Sarv OTP" width="120" />
 </p>
 
-<h1 align="center">Sarv Authenticator</h1>
+<h1 align="center">Sarv OTP</h1>
 
 A clean-room, **Google Authenticator-compatible** TOTP/HOTP app built with Flutter
 (Android + iOS from one codebase) and themed with the **Sarv design system**.
@@ -29,6 +29,19 @@ Long-press a row for the actions menu; swipe to edit or delete:
 
 > Codes shown are from demo accounts seeded for the screenshots — not live
 > secrets. On device, `FLAG_SECURE` blocks screenshots of real codes.
+
+## Install
+
+- **Android** — grab the signed `.apk` from the
+  [latest release](https://github.com/Sarv/Authenticator/releases) and sideload
+  it (the one-time "allow unknown apps" prompt is a property of installing outside
+  the Play Store, not a warning about the app). See [RELEASING.md](RELEASING.md).
+- **iOS** — distributed through **TestFlight / the App Store**; iOS has no
+  sideloadable equivalent of an APK. See [RELEASING-iOS.md](RELEASING-iOS.md) for
+  the signing and submission setup.
+
+Your privacy: the app collects nothing and makes no network requests — see the
+[Privacy Policy](docs/PRIVACY.md).
 
 ## How a code is produced (entirely offline, no network)
 
@@ -141,7 +154,7 @@ flutter run           # on a connected device/emulator
 **iOS** — add to `ios/Runner/Info.plist`:
 ```xml
 <key>NSFaceIDUsageDescription</key>
-<string>Unlock Sarv Authenticator with Face ID to view your codes.</string>
+<string>Unlock Sarv OTP with Face ID to view your codes.</string>
 <key>NSCameraUsageDescription</key>
 <string>Scan QR codes to add authenticator accounts</string>
 ```

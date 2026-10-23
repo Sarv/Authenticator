@@ -1,4 +1,4 @@
-package com.sarv.sarv_authenticator
+package com.sarv.otp
 
 import android.os.Bundle
 import android.view.WindowManager

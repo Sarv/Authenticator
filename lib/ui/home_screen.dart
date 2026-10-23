@@ -275,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const AppLogo(size: 28),
           const SizedBox(width: AppTokens.space2),
           Text(
-            'Sarv Authenticator',
+            'Sarv OTP',
             style: TextStyle(
               fontFamily: AppTokens.fontSans,
               fontWeight: FontWeight.w700,

@@ -35,7 +35,7 @@ class LockScreen extends StatelessWidget {
                       const AppLogo(size: 96),
                       const SizedBox(height: AppTokens.space6),
                       Text(
-                        'Sarv Authenticator',
+                        'Sarv OTP',
                         style: TextStyle(
                           fontFamily: AppTokens.fontSans,
                           fontSize: 18,

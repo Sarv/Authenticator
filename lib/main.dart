@@ -42,7 +42,7 @@ class SarvAuthenticatorApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: theme,
       builder: (context, _) => MaterialApp(
-        title: 'Sarv Authenticator',
+        title: 'Sarv OTP',
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(AppTokens.light, Brightness.light),
         darkTheme: buildAppTheme(AppTokens.dark, Brightness.dark),

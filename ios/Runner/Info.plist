@@ -7,7 +7,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Sarv Authenticator</string>
+		<string>Sarv OTP</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
@@ -24,12 +24,17 @@
 		<string>????</string>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<!-- The app uses only standard cryptography (TOTP HMAC, AES-GCM/PBKDF2
+		     backups) for its own authentication, which is exempt under US EAR
+		     740.17(b). Declaring this suppresses the per-upload export prompt. -->
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>NSCameraUsageDescription</key>
 		<string>Scan QR codes to add authenticator accounts.</string>
 		<key>NSFaceIDUsageDescription</key>
-		<string>Unlock Sarv Authenticator with Face ID to view your codes.</string>
+		<string>Unlock Sarv OTP with Face ID to view your codes.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>
