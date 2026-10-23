@@ -101,7 +101,7 @@ jobs:
       - name: Name the artifact after the tag
         run: |
           mv build/ios/ipa/*.ipa \
-             sarv-authenticator-${{ github.ref_name }}.ipa
+             sarv-otp-${{ github.ref_name }}.ipa
 
       # Upload to App Store Connect / TestFlight. altool authenticates with the
       # API key written above; no Apple ID password or 2FA is involved.
@@ -112,13 +112,13 @@ jobs:
         run: >
           API_PRIVATE_KEYS_DIR="$ASC_KEY_DIR"
           xcrun altool --upload-app --type ios
-          --file sarv-authenticator-${{ github.ref_name }}.ipa
+          --file sarv-otp-${{ github.ref_name }}.ipa
           --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: sarv-authenticator-${{ github.ref_name }}.ipa
+          files: sarv-otp-${{ github.ref_name }}.ipa
           generate_release_notes: true
 
       # Secrets are written to the workspace / keychain; remove them even though

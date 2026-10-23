@@ -66,12 +66,12 @@ jobs:
       - name: Name the artifact after the tag
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk \
-             sarv-authenticator-${{ github.ref_name }}.apk
+             sarv-otp-${{ github.ref_name }}.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: sarv-authenticator-${{ github.ref_name }}.apk
+          files: sarv-otp-${{ github.ref_name }}.apk
           generate_release_notes: true
 
       # Secrets are written to the workspace as files; remove them even though the
