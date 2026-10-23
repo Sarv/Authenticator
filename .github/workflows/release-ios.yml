@@ -1,0 +1,121 @@
+name: Release iOS
+
+# Cutting an iOS release is a single action: push a version tag (e.g. `v0.1.2`).
+# This builds a signed App Store `.ipa` and uploads it to TestFlight via the
+# App Store Connect API. From there you promote the build to the App Store in
+# App Store Connect. Signing an iOS build needs Apple's toolchain, so this runs
+# on a macOS runner (the Android job stays on ubuntu).
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # needed to attach the .ipa to the GitHub Release
+
+jobs:
+  build-ipa:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7 # keep in step with the local toolchain
+          cache: true
+
+      # The tag drives the version: `v0.1.2` -> CFBundleShortVersionString 0.1.2.
+      # The build number is the monotonic workflow run number so every upload to
+      # App Store Connect is unique (it rejects a repeated build number).
+      - name: Resolve version from tag
+        id: ver
+        run: echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      # Import the Apple Distribution certificate (.p12) into a throwaway keychain
+      # so codesign can find it, then unlock it for the build.
+      - name: Import signing certificate
+        env:
+          CERT_BASE64: ${{ secrets.IOS_DIST_CERT_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+        run: |
+          CERT_PATH="$RUNNER_TEMP/dist-cert.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+          echo "$CERT_BASE64" | base64 --decode > "$CERT_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -P "$CERT_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain-db
+          rm -f "$CERT_PATH"
+
+      # Install the App Store provisioning profile where Xcode looks for it.
+      - name: Install provisioning profile
+        env:
+          PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR"
+          echo "$PROFILE_BASE64" | base64 --decode > "$PROFILE_DIR/sarv_authenticator.mobileprovision"
+
+      # Credentials for uploading to App Store Connect (App Store Connect API key).
+      # The .p8 is written where xcrun altool / notarytool can read it by ID.
+      - name: Write App Store Connect API key
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+        run: |
+          KEY_DIR="$RUNNER_TEMP/private_keys"
+          mkdir -p "$KEY_DIR"
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_DIR/AuthKey_${ASC_KEY_ID}.p8"
+          echo "ASC_KEY_DIR=$KEY_DIR" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # ios/ExportOptions.plist (committed) selects app-store-connect export with
+      # manual signing against the installed distribution cert + profile.
+      - name: Build signed release IPA
+        run: >
+          flutter build ipa --release
+          --build-name=${{ steps.ver.outputs.name }}
+          --build-number=${{ github.run_number }}
+          --export-options-plist=ios/ExportOptions.plist
+
+      - name: Name the artifact after the tag
+        run: |
+          mv build/ios/ipa/*.ipa \
+             sarv-authenticator-${{ github.ref_name }}.ipa
+
+      # Upload to App Store Connect / TestFlight. altool authenticates with the
+      # API key written above; no Apple ID password or 2FA is involved.
+      - name: Upload to TestFlight
+        env:
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: >
+          API_PRIVATE_KEYS_DIR="$ASC_KEY_DIR"
+          xcrun altool --upload-app --type ios
+          --file sarv-authenticator-${{ github.ref_name }}.ipa
+          --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sarv-authenticator-${{ github.ref_name }}.ipa
+          generate_release_notes: true
+
+      # Secrets are written to the workspace / keychain; remove them even though
+      # the runner is ephemeral, so a later step can never read the material.
+      - name: Scrub signing material
+        if: always()
+        run: |
+          rm -rf "$RUNNER_TEMP/private_keys" "$RUNNER_TEMP/build.keychain-db"
+          rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/sarv_authenticator.mobileprovision"

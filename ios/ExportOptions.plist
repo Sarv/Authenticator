@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Export for upload to App Store Connect / TestFlight. -->
+	<key>method</key>
+	<string>app-store-connect</string>
+
+	<!-- Manual signing against the distribution cert + profile the CI installs,
+	     so the build never needs to contact Apple to resolve signing. -->
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+
+	<!-- REPLACE LV54AA5562 with your 10-character Apple Developer Team ID
+	     (App Store Connect -> Membership, e.g. A1B2C3D4E5). -->
+	<key>teamID</key>
+	<string>LV54AA5562</string>
+
+	<!-- Maps the app's bundle id to the provisioning profile NAME (not file name)
+	     as it appears in the Apple Developer portal. REPLACE the value with that
+	     profile's name; the key must stay the bundle id. -->
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.sarv.otp</key>
+		<string>Sarv OTP App Store</string>
+	</dict>
+
+	<!-- Let Apple manage the app's build-time symbol upload for crash reports;
+	     no third-party symbols leave the build. -->
+	<key>uploadSymbols</key>
+	<true/>
+
+	<!-- Suppress Bitcode (deprecated by Apple) and app-thinning variants; a plain
+	     universal .ipa is what altool uploads. -->
+	<key>uploadBitcode</key>
+	<false/>
+	<key>stripSwiftSymbols</key>
+	<true/>
+</dict>
+</plist>
