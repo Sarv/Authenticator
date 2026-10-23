@@ -35,6 +35,8 @@
 		<string>Scan QR codes to add authenticator accounts.</string>
 		<key>NSFaceIDUsageDescription</key>
 		<string>Unlock Sarv OTP with Face ID to view your codes.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Import a QR code image from your photos to add an account.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>
