@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-23
+
 ### Added
 - Clean-room TOTP (RFC 6238) and HOTP (RFC 4226) engine with SHA-1/256/512 and 6- or 8-digit codes.
 - QR-code enrollment (`otpauth://` Key URI parsing) and manual setup-key entry with algorithm, digit-count and period selection.
@@ -25,4 +27,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Secrets are stored only in the OS-backed keystore (Android Keystore / iOS Keychain) — never in plain preferences, files, or over the network.
 - Backup passphrases are never stored and cannot be recovered.
 
-[Unreleased]: https://github.com/ankursarv/sarv_authenticator/compare/HEAD
+[Unreleased]: https://github.com/Sarv/Authenticator/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Sarv/Authenticator/releases/tag/v0.1.1
