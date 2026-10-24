@@ -43,12 +43,76 @@ Long-press a row for the actions menu; swipe to edit or delete:
 Your privacy: the app collects nothing and makes no network requests — see the
 [Privacy Policy](docs/PRIVACY.md).
 
-## How a code is produced (entirely offline, no network)
+## How it works — entirely offline, no network
 
-1. Scan a QR → store the Base32 `secret` in the OS keystore. Nothing is ever sent.
-2. Every 30 s: `counter = floor(unixTimeUTC / 30)`.
-3. `hmac = HMAC-SHA1(secret, counter)` → dynamic truncation → `mod 10^6` → 6 digits.
-4. The server runs the identical math with the same secret and compares.
+A TOTP code is just an **HMAC of the current time under a shared secret**, truncated
+to six digits. The secret is exchanged **once**, at enrollment (the QR code the
+service shows you). After that the phone and the server never talk again — each side
+independently computes the same six digits from the only two things they both have:
+the **secret** and the **current UTC time**. That is the whole reason the app keeps
+working in airplane mode, on a plane, or with the SIM removed.
+
+**1. One-time enrollment** (the secret travels in the QR, so this needs no network of ours):
+
+- The service shows an `otpauth://` QR embedding the Base32 `secret` plus parameters
+  (issuer, algorithm, digit count, period). `core/otpauth_uri.dart` parses it;
+  `core/base32.dart` decodes the secret.
+- The raw secret is written straight into the **OS-backed keystore** — Android
+  Keystore / iOS Keychain (`data/account_store.dart`). It never leaves the device,
+  never touches plain storage, and never goes over any network.
+
+**2. Every period** (default 30 s) — the fully offline loop, in `core/totp.dart`:
+
+1. `counter = floor(unixTimeUTC / period)` — derived from the device clock in **UTC**,
+   so the code is identical on every device regardless of time zone.
+2. `digest = HMAC-SHA1(secret, counter)` (SHA-256 / SHA-512 also supported).
+3. **Dynamic truncation** (RFC 4226 §5.3): the low nibble of the last byte picks a
+   4-byte offset; read those 4 bytes and drop the top bit → a 31-bit integer.
+4. `code = integer mod 10^digits`, zero-padded → the digits you see. A ring counts
+   down the seconds left in the window.
+
+**3. Verification:** the server stored the *same* secret at enrollment and runs the
+*identical* math against its own UTC clock (usually accepting ±1 window for clock
+drift), then compares. Nothing is transmitted at login — you simply type what both
+sides already computed.
+
+```mermaid
+flowchart TD
+    subgraph ENROLL["1 - One-time enrollment (secret shared once)"]
+        QR["Service shows QR<br/>otpauth://...secret=BASE32"]
+        PARSE["Parse URI and Base32 decode"]
+        KS["OS Keystore / Keychain<br/>(encrypted secret, on device)"]
+        QR --> PARSE --> KS
+    end
+
+    subgraph LOOP["2 - Every period, default 30s (fully offline)"]
+        CLK["Device clock in UTC"]
+        CTR["counter = floor(unixUTC / period)"]
+        HMAC["HMAC-SHA1(secret, counter)"]
+        TRUNC["Dynamic truncation to 31-bit int"]
+        CODE["value mod 10^digits = 6 digits"]
+        UI["Code shown with countdown ring"]
+        CLK --> CTR --> HMAC --> TRUNC --> CODE --> UI
+        KS --> HMAC
+    end
+
+    subgraph SRV["3 - Login server (independently)"]
+        KS2["Same secret, stored at enrollment"]
+        CLK2["Server clock in UTC"]
+        HMAC2["Same HMAC and truncation"]
+        EXP["Expected 6 digits"]
+        KS2 --> HMAC2
+        CLK2 --> HMAC2 --> EXP
+    end
+
+    UI -. "you type the 6 digits" .-> MATCH{"equal? grant access"}
+    EXP --> MATCH
+```
+
+> **Offline by construction:** the only inputs are the on-device secret and the clock.
+> There is no call home, no sync, and no account on any Sarv server — which is also why
+> uninstalling without an [encrypted backup](#encrypted-export--import) is
+> unrecoverable, by design.
 
 ## Layout
 
