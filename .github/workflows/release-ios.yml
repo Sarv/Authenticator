@@ -9,6 +9,18 @@ on:
   push:
     tags:
       - "v*"
+  # Manual run: ship another TestFlight build without a new marketing version.
+  # Keeps CFBundleShortVersionString fixed and only bumps the build number, so
+  # the upload needs no new App Review (internal testers get it immediately).
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Marketing version (CFBundleShortVersionString), e.g. 0.1.1"
+        required: true
+        default: "0.1.1"
+      build_number:
+        description: "Build number (CFBundleVersion); must exceed the last upload for that version"
+        required: true
 
 permissions:
   contents: write # needed to attach the .ipa to the GitHub Release
@@ -39,9 +51,19 @@ jobs:
       # The tag drives the version: `v0.1.2` -> CFBundleShortVersionString 0.1.2.
       # The build number is the monotonic workflow run number so every upload to
       # App Store Connect is unique (it rejects a repeated build number).
-      - name: Resolve version from tag
+      # A tag push (v0.1.2) sets the marketing version from the tag — a real,
+      # reviewable App Store version. A manual run keeps the version fixed and
+      # only bumps the build number, so the upload goes to TestFlight review-free.
+      - name: Resolve version and build number
         id: ver
-        run: echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "build=${{ github.event.inputs.build_number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            echo "build=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          fi
 
       # Import the Apple Distribution certificate (.p12) into a throwaway keychain
       # so codesign can find it, then unlock it for the build.
@@ -95,13 +117,13 @@ jobs:
         run: >
           flutter build ipa --release
           --build-name=${{ steps.ver.outputs.name }}
-          --build-number=${{ github.run_number }}
+          --build-number=${{ steps.ver.outputs.build }}
           --export-options-plist=ios/ExportOptions.plist
 
-      - name: Name the artifact after the tag
+      - name: Name the artifact
         run: |
           mv build/ios/ipa/*.ipa \
-             sarv-otp-${{ github.ref_name }}.ipa
+             sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}.ipa
 
       # Upload to App Store Connect / TestFlight. altool authenticates with the
       # API key written above; no Apple ID password or 2FA is involved.
@@ -112,7 +134,7 @@ jobs:
         run: >
           API_PRIVATE_KEYS_DIR="$ASC_KEY_DIR"
           xcrun altool --upload-app --type ios
-          --file sarv-otp-${{ github.ref_name }}.ipa
+          --file sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}.ipa
           --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
       # Release notes are the curated CHANGELOG.md entry for this version, not
@@ -121,10 +143,13 @@ jobs:
       - name: Build release notes from CHANGELOG
         run: bash .github/scripts/changelog-section.sh "${{ steps.ver.outputs.name }}" CHANGELOG.md RELEASE_NOTES.md
 
+      # Only a tagged version is a real release; a manual build-only run uploads
+      # to TestFlight and does not create or touch a GitHub Release.
       - name: Publish GitHub Release
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          files: sarv-otp-${{ github.ref_name }}.ipa
+          files: sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}.ipa
           body_path: RELEASE_NOTES.md
           generate_release_notes: false
 
