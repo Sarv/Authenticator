@@ -79,11 +79,18 @@ jobs:
           --build-name=${{ steps.ver.outputs.name }}
           --build-number=${{ github.run_number }}
 
+      # Release notes are the curated CHANGELOG.md entry for this version, not
+      # scraped commit subjects. generate_release_notes is off so nothing is
+      # appended (both the iOS and Android jobs publish the same body for the tag).
+      - name: Build release notes from CHANGELOG
+        run: bash .github/scripts/changelog-section.sh "${{ steps.ver.outputs.name }}" CHANGELOG.md RELEASE_NOTES.md
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: sarv-otp-${{ github.ref_name }}.apk
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: false
 
       # Only attempt a Play upload when the service-account secret is configured;
       # otherwise this tag just produces the APK + GitHub Release as before.
