@@ -1,7 +1,10 @@
 name: Release Android
 
 # Cutting a release is a single action: push a version tag (e.g. `v0.1.2`).
-# This builds a signed release APK and attaches it to a GitHub Release.
+# This builds a signed release APK (attached to a GitHub Release for sideloading)
+# and a signed release AAB. When the PLAY_SERVICE_ACCOUNT_JSON secret is present,
+# the AAB is also uploaded to Google Play's `internal` testing track; without that
+# secret the Play step is skipped, so the APK/GitHub path keeps working unchanged.
 on:
   push:
     tags:
@@ -68,11 +71,46 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk \
              sarv-otp-${{ github.ref_name }}.apk
 
+      # Google Play distributes App Bundles, not APKs. Same signing config and the
+      # same monotonic versionCode as the APK, so Play never sees a duplicate.
+      - name: Build signed release App Bundle (AAB)
+        run: >
+          flutter build appbundle --release
+          --build-name=${{ steps.ver.outputs.name }}
+          --build-number=${{ github.run_number }}
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: sarv-otp-${{ github.ref_name }}.apk
           generate_release_notes: true
+
+      # Only attempt a Play upload when the service-account secret is configured;
+      # otherwise this tag just produces the APK + GitHub Release as before.
+      - name: Detect Play credentials
+        id: play
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$PLAY_JSON" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "PLAY_SERVICE_ACCOUNT_JSON not set - skipping Play upload." >&2
+          fi
+
+      # The app must already exist in the Play Console and have its required
+      # declarations (listing, content rating, data safety) completed before an
+      # API upload is accepted. Promote internal -> production in the Console.
+      - name: Upload AAB to Google Play (internal track)
+        if: steps.play.outputs.enabled == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.sarv.otp
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
 
       # Secrets are written to the workspace as files; remove them even though the
       # runner is ephemeral, so a later step can never read the signing material.
