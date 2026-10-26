@@ -29,7 +29,7 @@ class BackupService {
         .split('.')
         .first;
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/sarv-authenticator-$stamp.$_extension');
+    final file = File('${dir.path}/sarv-otp-$stamp.$_extension');
     await file.writeAsString(envelope, flush: true);
 
     await Share.shareXFiles(

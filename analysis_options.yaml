@@ -1,4 +1,4 @@
-# Static analysis for Sarv Authenticator.
+# Static analysis for Sarv OTP.
 # Starts from the recommended Flutter lints and tightens a few rules that
 # matter for a security-sensitive, functional-leaning codebase.
 include: package:flutter_lints/flutter.yaml

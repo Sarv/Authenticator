@@ -20,13 +20,13 @@ Future<void> main() async {
   // shown, and the store notifies its listeners once the load completes, so the
   // list fills in behind the lock with time to spare. The theme preference loads
   // the same way — the app renders in the system theme until it arrives.
-  runApp(SarvAuthenticatorApp(store: store, lock: AppLock(), theme: theme));
+  runApp(SarvOtpApp(store: store, lock: AppLock(), theme: theme));
   unawaited(store.load());
   unawaited(theme.load());
 }
 
-class SarvAuthenticatorApp extends StatelessWidget {
-  const SarvAuthenticatorApp({
+class SarvOtpApp extends StatelessWidget {
+  const SarvOtpApp({
     super.key,
     required this.store,
     required this.lock,
