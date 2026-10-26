@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-26
+
+### Changed
+- Release CI now builds a signed Android App Bundle (AAB) alongside the APK and, when a Google Play service account is configured, uploads it to the Play internal testing track.
+
+### Added
+- README section explaining how codes are generated entirely offline, with a diagram of the enrollment, per-period and verification flow.
+
 ## [0.1.1] - 2026-10-23
 
 ### Added
@@ -27,5 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Secrets are stored only in the OS-backed keystore (Android Keystore / iOS Keychain) — never in plain preferences, files, or over the network.
 - Backup passphrases are never stored and cannot be recovered.
 
-[Unreleased]: https://github.com/Sarv/Authenticator/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Sarv/Authenticator/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/Sarv/Authenticator/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Sarv/Authenticator/releases/tag/v0.1.1
