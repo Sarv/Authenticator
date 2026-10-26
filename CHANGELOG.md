@@ -35,6 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Secrets are stored only in the OS-backed keystore (Android Keystore / iOS Keychain) — never in plain preferences, files, or over the network.
 - Backup passphrases are never stored and cannot be recovered.
 
-[Unreleased]: https://github.com/Sarv/Authenticator/compare/v0.1.2...HEAD
-[0.1.2]: https://github.com/Sarv/Authenticator/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/Sarv/Authenticator/releases/tag/v0.1.1
+[Unreleased]: https://github.com/Sarv/OTP/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/Sarv/OTP/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/Sarv/OTP/releases/tag/v0.1.1

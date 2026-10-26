@@ -33,7 +33,7 @@ Long-press a row for the actions menu; swipe to edit or delete:
 ## Install
 
 - **Android** — grab the signed `.apk` from the
-  [latest release](https://github.com/Sarv/Authenticator/releases) and sideload
+  [latest release](https://github.com/Sarv/OTP/releases) and sideload
   it (the one-time "allow unknown apps" prompt is a property of installing outside
   the Play Store, not a warning about the app). See [RELEASING.md](RELEASING.md).
 - **iOS** — distributed through **TestFlight / the App Store**; iOS has no
