@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sarv OTP</title>
+  <meta name="description" content="Sarv OTP — an offline, open-source two-factor authenticator for Android and iOS, compatible with Google Authenticator." />
+  <link rel="icon" href="assets/authenticator-icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/sarv_theme/fonts.css" />
+  <link rel="stylesheet" href="assets/sarv_theme/design-system.css" />
+  <link rel="stylesheet" href="site.css" />
+  <script>
+    // The design system flips to dark via the .dark class; follow the OS setting.
+    const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const applyTheme = () => document.documentElement.classList.toggle('dark', darkQuery.matches);
+    applyTheme();
+    darkQuery.addEventListener('change', applyTheme);
+  </script>
+</head>
+<body>
+  <main class="site">
+
+    <header class="hero">
+      <img class="hero-icon" src="assets/authenticator-icon.svg" alt="" width="88" height="88" />
+      <h1>Sarv OTP</h1>
+      <p class="hero-tagline">Two-factor codes that never leave your phone.</p>
+      <p class="hero-lede">
+        A free, open-source authenticator for Android and iOS. Scan the QR code a service
+        shows you and Sarv OTP generates the rolling 6-digit codes — fully offline, with
+        secrets locked in your device's keystore. Works anywhere "Authenticator app" 2FA
+        is offered: Google, GitHub, AWS and more.
+      </p>
+
+      <div class="store-row">
+        <button class="btn btn-secondary btn-lg store-btn" disabled aria-disabled="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3.5v17l9.2-8.5L4 3.5Zm10.6 7.2 2.7-2.5L6.6 2.4l8 8.3Zm0 2.6-8 8.3 10.7-5.8-2.7-2.5Zm4.2-3.9L16 11.9l2.8 2.6 2.2-1.2c.7-.4.7-1.2 0-1.6l-2.2-1.2Z" fill="currentColor"/></svg>
+          <span class="store-text"><small>Get it on</small>Google Play</span>
+        </button>
+        <button class="btn btn-secondary btn-lg store-btn" disabled aria-disabled="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9ZM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4Z" fill="currentColor"/></svg>
+          <span class="store-text"><small>Download on the</small>App Store</span>
+        </button>
+      </div>
+      <p class="hint">Store listings are coming soon — meanwhile, use a direct download below.</p>
+    </header>
+
+    <section class="shots" aria-label="Screenshots">
+      <figure><img src="screenshots/01-home-light.png" alt="Home screen with rolling codes, light theme" loading="lazy" /><figcaption>Your codes</figcaption></figure>
+      <figure><img src="screenshots/02-home-dark.png" alt="Home screen, dark theme" loading="lazy" /><figcaption>Dark theme</figcaption></figure>
+      <figure><img src="screenshots/04-add-light.png" alt="Add account: scan a QR code or enter a key" loading="lazy" /><figcaption>Scan or type a key</figcaption></figure>
+      <figure><img src="screenshots/03-settings-light.png" alt="Settings: theme, app lock and encrypted backup" loading="lazy" /><figcaption>App lock &amp; backup</figcaption></figure>
+      <figure><img src="screenshots/06-swipe-light.png" alt="Swiping a row reveals edit and delete" loading="lazy" /><figcaption>Swipe to edit</figcaption></figure>
+    </section>
+
+    <section class="section">
+      <h2>Direct downloads</h2>
+      <div class="download-grid">
+        <div class="card card-pad download-card">
+          <div class="download-head">
+            <h3>Android</h3>
+            <span class="badge brand">APK</span>
+          </div>
+          <p class="muted">The signed APK from our latest GitHub release. Android will ask once to "allow unknown apps" — that's normal for any install outside the Play Store.</p>
+          <a class="btn btn-primary" href="https://github.com/Sarv/OTP/releases/latest">Download latest APK</a>
+        </div>
+        <div class="card card-pad download-card">
+          <div class="download-head">
+            <h3>iOS</h3>
+            <span class="badge">TestFlight</span>
+          </div>
+          <p class="muted">iOS doesn't allow sideloading, so iPhone builds ship through TestFlight until the App Store listing goes live.</p>
+          <a class="btn btn-secondary" href="https://github.com/Sarv/OTP/releases">All releases &amp; notes</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Why Sarv OTP</h2>
+      <div class="feature-grid">
+        <div class="card card-pad"><h3>Offline by design</h3><p class="muted">No account, no sync, no network calls. Codes are computed from the secret and the clock — it works in airplane mode.</p></div>
+        <div class="card card-pad"><h3>Keystore-backed</h3><p class="muted">Secrets live in Android Keystore / iOS Keychain, with optional biometric app lock and screenshot blocking.</p></div>
+        <div class="card card-pad"><h3>Standards-based</h3><p class="muted">Implements TOTP (RFC 6238), HOTP (RFC 4226) and <span class="mono">otpauth://</span> — the same standards Google Authenticator uses.</p></div>
+        <div class="card card-pad"><h3>Encrypted backup</h3><p class="muted">Export your accounts to a password-protected file and import them on a new phone.</p></div>
+      </div>
+    </section>
+
+    <footer class="site-footer muted">
+      <a href="https://github.com/Sarv/OTP">Source on GitHub</a>
+      <a href="https://github.com/Sarv/OTP/blob/main/docs/PRIVACY.md">Privacy policy</a>
+      <a href="https://github.com/Sarv/OTP/blob/main/LICENSE">Apache 2.0</a>
+      <span>&copy; Sarv</span>
+    </footer>
+
+  </main>
+</body>
+</html>
