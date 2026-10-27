@@ -4,6 +4,8 @@
 
 <h1 align="center">Sarv OTP</h1>
 
+<p align="center"><a href="https://sarv.github.io/OTP/"><strong>sarv.github.io/OTP</strong></a> — downloads, screenshots and features</p>
+
 A clean-room, **Google Authenticator-compatible** TOTP/HOTP app built with Flutter
 (Android + iOS from one codebase) and themed with the **Sarv design system**.
 
@@ -31,6 +33,8 @@ Long-press a row for the actions menu; swipe to edit or delete:
 > secrets. On device, `FLAG_SECURE` blocks screenshots of real codes.
 
 ## Install
+
+Download links for every platform are on the [Sarv OTP website](https://sarv.github.io/OTP/).
 
 - **Android** — grab the signed `.apk` from the
   [latest release](https://github.com/Sarv/OTP/releases) and sideload
