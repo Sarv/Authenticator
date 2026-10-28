@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Go back" on the scanner's camera-unavailable screen now works; the QR frame was drawn over the button and swallowed the tap.
 - Exporting an encrypted backup now shows a loader while the backup is encrypted, instead of a pause with no feedback before the share sheet opens.
 - Importing a backup now shows a loader while it is decrypted and saved, until the result or an error appears.
+- Exporting a backup on iOS no longer fails with "sharePositionOrigin: argument must be set"; the share sheet is now anchored to the export row.
 
 ## [0.1.2] - 2026-10-26
 
