@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Importing a backup now shows a loader while it is decrypted and saved, until the result or an error appears.
 - Exporting a backup on iOS no longer fails with "sharePositionOrigin: argument must be set"; the share sheet is now anchored to the export row.
 
+### Security
+- iOS now blocks screenshots and screen recordings of codes, matching Android: captures come out black, the app explains why after a screenshot, and codes are hidden in the app switcher. Previously iOS had no capture protection at all.
+
 ## [0.1.2] - 2026-10-26
 
 ### Changed
