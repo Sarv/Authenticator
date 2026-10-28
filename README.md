@@ -30,7 +30,7 @@ Long-press a row for the actions menu; swipe to edit or delete:
 | <img src="docs/screenshots/05-menu-light.png" width="200" alt="Long-press actions menu: Rename or Remove" /> | <img src="docs/screenshots/06-swipe-light.png" width="200" alt="Swiping a row reveals the Edit action" /> |
 
 > Codes shown are from demo accounts seeded for the screenshots — not live
-> secrets. On device, `FLAG_SECURE` blocks screenshots of real codes.
+> secrets. On device, screenshots and recordings of real codes come out blank.
 
 ## Install
 
@@ -239,18 +239,16 @@ independently confirmed against a Python reference during development.
   file, logs, or the network.
 - Biometric/PIN app-lock gates access and re-locks on backgrounding.
 - Encrypted, passphrase-protected export/import (AES-GCM-256 + PBKDF2).
-- **Screenshot/recording blocked** — `enableSecureDisplay()` (called at startup
-  in `main.dart`) sets Android `FLAG_SECURE` and covers the iOS app-switcher
-  snapshot, so live codes can't be captured. This mirrors Google Authenticator,
-  whose window is `FLAG_SECURE` too (a screenshot of it comes back black).
-  Zero-dependency alternative: skip the `screen_protector` package and instead
-  add this to `MainActivity` after `flutter create .`:
-  ```kotlin
-  override fun onCreate(savedInstanceState: Bundle?) {
-      super.onCreate(savedInstanceState)
-      window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-                      WindowManager.LayoutParams.FLAG_SECURE)
-  }
-  ```
+- **Screenshot/recording blocked** — live codes can't be captured on either
+  platform.
+  - Android: `MainActivity` sets `FLAG_SECURE`, so the system refuses
+    screenshots and recordings ("Can't take screenshot") and blanks the recents
+    preview — the same protection Google Authenticator uses.
+  - iOS has no way to refuse a screenshot, so `SecureDisplay`
+    (`ios/Runner/AppDelegate.swift`, enabled from `enableSecureDisplay()` in
+    `main.dart`) draws the app inside a secure layer that iOS leaves out of
+    screenshots, screen recordings and mirroring — the capture comes out
+    black. The app then says "Screenshots are blocked to protect your codes",
+    and a cover hides the codes in the app switcher.
 - Consider adding: SHA256/512 selection in the enrollment UI (the engine already
   handles all three algorithms), and iCloud/Drive backup destinations.
