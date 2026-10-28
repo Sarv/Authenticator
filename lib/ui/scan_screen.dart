@@ -47,29 +47,23 @@ class _ScanScreenState extends State<ScanScreen> {
         foregroundColor: Colors.white,
         title: const Text('Scan QR code'),
       ),
-      // StackFit.expand forces both children to fill the body. Without it the
-      // Stack shrinks to its largest sized child, and while the camera preview
-      // still has zero size (during the permission prompt) that is the 240x240
-      // reticle — which then pins to the top-left instead of centring.
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          MobileScanner(
-            onDetect: _onDetect,
-            errorBuilder: (context, error) => _ScanError(error: error),
-          ),
-          // Reticle framing the QR, tinted with the brand token.
-          Center(
-            child: Container(
-              width: 240,
-              height: 240,
-              decoration: BoxDecoration(
-                border: Border.all(color: tokens.brand, width: 3),
-                borderRadius: BorderRadius.circular(AppTokens.rXl),
-              ),
+      body: MobileScanner(
+        onDetect: _onDetect,
+        errorBuilder: (context, error) => _ScanError(error: error),
+        // The reticle goes in overlayBuilder, which the scanner only draws over
+        // a live preview. Stacked on top of the scanner instead, it also covered
+        // the permission-denied screen and swallowed taps on its "Go back"
+        // button, which sits inside the reticle's 240x240 centre.
+        overlayBuilder: (context, constraints) => Center(
+          child: Container(
+            width: 240,
+            height: 240,
+            decoration: BoxDecoration(
+              border: Border.all(color: tokens.brand, width: 3),
+              borderRadius: BorderRadius.circular(AppTokens.rXl),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
