@@ -6,16 +6,20 @@ import '../core/backup.dart';
 import 'account.dart';
 
 /// File-level glue for encrypted backups: turns the [encryptBackup] /
-/// [decryptBackup] core into "share a file" and "pick a file" operations.
-/// All disk / platform I/O lives here, at the edge.
+/// [decryptBackup] core into "write and share a file" and "pick and decrypt a
+/// file" operations. All disk / platform I/O lives here, at the edge.
+///
+/// The steps are separate so the UI can show a loader around the slow part —
+/// the PBKDF2 key derivation takes a couple of seconds — without the loader
+/// covering the share sheet or the file picker.
 class BackupService {
   const BackupService();
 
   static const _extension = 'sauthbackup';
 
-  /// Encrypts [accounts] with [passphrase], writes the envelope to a timestamped
-  /// file, and opens the system share sheet so the user can save or send it.
-  Future<void> exportAndShare({
+  /// Encrypts [accounts] with [passphrase] and writes the envelope to a
+  /// timestamped file. Returns the file's path.
+  Future<String> writeEncryptedBackup({
     required List<Account> accounts,
     required String passphrase,
   }) async {
@@ -31,16 +35,21 @@ class BackupService {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/sarv-otp-$stamp.$_extension');
     await file.writeAsString(envelope, flush: true);
+    return file.path;
+  }
 
+  /// Opens the system share sheet for the backup file at [path] so the user
+  /// can save or send it.
+  Future<void> share(String path) async {
     await Share.shareXFiles(
-      [XFile(file.path, mimeType: 'application/json')],
+      [XFile(path, mimeType: 'application/json')],
       subject: 'Sarv OTP backup',
     );
   }
 
-  /// Lets the user pick a backup file and decrypts it with [passphrase].
-  /// Returns null if the user cancels the picker.
-  Future<List<Account>?> pickAndDecrypt({required String passphrase}) async {
+  /// Lets the user pick a backup file and returns its contents, or null if the
+  /// user cancels the picker.
+  Future<String?> pickBackup() async {
     final result = await FilePicker.platform.pickFiles(withData: true);
     if (result == null || result.files.isEmpty) return null;
 
@@ -50,7 +59,13 @@ class BackupService {
     if (bytes == null) {
       throw const BackupDecryptException('Could not read the selected file');
     }
-
-    return decryptBackup(String.fromCharCodes(bytes), passphrase);
+    return String.fromCharCodes(bytes);
   }
+
+  /// Decrypts a backup's [contents] with [passphrase].
+  Future<List<Account>> decrypt({
+    required String contents,
+    required String passphrase,
+  }) =>
+      decryptBackup(contents, passphrase);
 }

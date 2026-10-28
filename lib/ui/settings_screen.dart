@@ -5,6 +5,7 @@ import '../data/app_lock.dart';
 import '../data/backup_service.dart';
 import '../data/theme_controller.dart';
 import 'passphrase_dialog.dart';
+import 'progress_dialog.dart';
 import 'theme.dart';
 
 /// App settings: the biometric app-lock toggle and encrypted backup/restore,
@@ -97,12 +98,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'stored and cannot be recovered.',
       confirm: true,
     );
-    if (passphrase == null) return;
+    if (passphrase == null || !mounted) return;
     try {
-      await widget.backup.exportAndShare(
-        accounts: widget.store.accounts,
-        passphrase: passphrase,
+      // The loader covers encrypting and writing the file, then closes before
+      // the share sheet opens (sharing waits until the sheet is dismissed).
+      final path = await runWithProgress(
+        context,
+        message: 'Encrypting backup…',
+        task: () => widget.backup.writeEncryptedBackup(
+          accounts: widget.store.accounts,
+          passphrase: passphrase,
+        ),
       );
+      await widget.backup.share(path);
     } catch (error) {
       _toast('Export failed: $error');
     }
@@ -117,10 +125,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (passphrase == null) return;
     try {
-      final accounts =
-          await widget.backup.pickAndDecrypt(passphrase: passphrase);
-      if (accounts == null) return; // user cancelled the file picker
-      final added = await widget.store.importAccounts(accounts);
+      final contents = await widget.backup.pickBackup();
+      if (contents == null || !mounted) return; // user cancelled the picker
+      // The loader covers decrypting and saving, up to the result toast.
+      final added = await runWithProgress(
+        context,
+        message: 'Importing backup…',
+        task: () async {
+          final accounts = await widget.backup.decrypt(
+            contents: contents,
+            passphrase: passphrase,
+          );
+          return widget.store.importAccounts(accounts);
+        },
+      );
       _toast(
         added == 0
             ? 'Nothing new to import — all accounts already present'
