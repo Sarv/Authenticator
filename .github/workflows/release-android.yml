@@ -9,6 +9,18 @@ on:
   push:
     tags:
       - "v*"
+  # Manual run: ship another build without a new version. Keeps versionName
+  # fixed and only bumps versionCode; the APK is kept as a run artifact and no
+  # GitHub Release is created or touched.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version name (versionName); 0.1.2 is the approved version"
+        required: true
+        default: "0.1.2"
+      build_number:
+        description: "Build number (versionCode); leave blank to use the workflow run number"
+        required: false
 
 permissions:
   contents: write # needed to create the GitHub Release and upload the APK
@@ -33,11 +45,19 @@ jobs:
           flutter-version: 3.47.7 # keep in step with the local toolchain
           cache: true
 
-      # The tag drives the version: `v0.1.2` -> versionName 0.1.2. The build
-      # number is the monotonic workflow run number so every release differs.
-      - name: Resolve version from tag
+      # A tag push drives the version: `v0.1.2` -> versionName 0.1.2. A manual
+      # run takes the version from its input. The build number is the monotonic
+      # workflow run number (or the manual input) so every build differs.
+      - name: Resolve version and build number
         id: ver
-        run: echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "build=${{ github.event.inputs.build_number || github.run_number }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            echo "build=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Restore signing keystore
         env:
@@ -64,12 +84,12 @@ jobs:
         run: >
           flutter build apk --release
           --build-name=${{ steps.ver.outputs.name }}
-          --build-number=${{ github.run_number }}
+          --build-number=${{ steps.ver.outputs.build }}
 
-      - name: Name the artifact after the tag
+      - name: Name the artifact after the version
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk \
-             sarv-otp-${{ github.ref_name }}.apk
+             sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}.apk
 
       # Google Play distributes App Bundles, not APKs. Same signing config and the
       # same monotonic versionCode as the APK, so Play never sees a duplicate.
@@ -77,7 +97,7 @@ jobs:
         run: >
           flutter build appbundle --release
           --build-name=${{ steps.ver.outputs.name }}
-          --build-number=${{ github.run_number }}
+          --build-number=${{ steps.ver.outputs.build }}
 
       # Release notes are the curated CHANGELOG.md entry for this version, not
       # scraped commit subjects. generate_release_notes is off so nothing is
@@ -85,12 +105,22 @@ jobs:
       - name: Build release notes from CHANGELOG
         run: bash .github/scripts/changelog-section.sh "${{ steps.ver.outputs.name }}" CHANGELOG.md RELEASE_NOTES.md
 
+      # Only a tagged version is a real release; a manual build keeps its APK as
+      # a downloadable run artifact instead.
       - name: Publish GitHub Release
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          files: sarv-otp-${{ github.ref_name }}.apk
+          files: sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}.apk
           body_path: RELEASE_NOTES.md
           generate_release_notes: false
+
+      - name: Keep the APK as a run artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}
+          path: sarv-otp-v${{ steps.ver.outputs.name }}-${{ steps.ver.outputs.build }}.apk
 
       # Only attempt a Play upload when the service-account secret is configured;
       # otherwise this tag just produces the APK + GitHub Release as before.

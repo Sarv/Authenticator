@@ -13,6 +13,22 @@ The tag drives the version — `v0.1.2` produces an APK with versionName `0.1.2`
 (no need to edit `pubspec.yaml` each time). The build number is the workflow run
 number, so every release is distinct.
 
+### Shipping a new build of the current version
+
+To ship fixes without a new version, keep the version fixed and only increment
+the build number — the same rule as iOS (see
+[RELEASING-iOS.md](RELEASING-iOS.md)). Run it from **Actions -> Release Android
+-> Run workflow**, or:
+
+```bash
+gh workflow run release-android.yml -f version=0.1.2
+```
+
+Leave the build number blank and the workflow uses its run number, which only
+ever increases. A manual run uploads to the Play internal track (when
+configured) and keeps the APK as a downloadable artifact on the run; it does not
+create or touch a GitHub Release.
+
 The published APK installs by sideloading: the installer shows the one-time
 **"allow installing unknown apps"** prompt the first time. That prompt is a
 property of installing outside the Play Store and signing cannot remove it — it
