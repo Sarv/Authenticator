@@ -35,6 +35,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _enabled = false;
   bool _saving = false;
   int _delaySeconds = 0;
+  // Locates the export row on screen; the iOS share sheet is anchored to it.
+  final _exportRowKey = GlobalKey();
 
   @override
   void initState() {
@@ -110,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           passphrase: passphrase,
         ),
       );
-      await widget.backup.share(path);
+      await widget.backup.share(path, origin: _globalRect(_exportRowKey));
     } catch (error) {
       _toast('Export failed: $error');
     }
@@ -212,6 +214,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                     children: [
                       _ActionRow(
+                        key: _exportRowKey,
                         icon: Icons.ios_share,
                         title: 'Export encrypted backup',
                         subtitle:
@@ -466,8 +469,15 @@ class _AutoLockRow extends StatelessWidget {
   }
 }
 
+/// The on-screen rect of the widget holding [key], in global coordinates.
+Rect _globalRect(GlobalKey key) {
+  final box = key.currentContext!.findRenderObject()! as RenderBox;
+  return box.localToGlobal(Offset.zero) & box.size;
+}
+
 class _ActionRow extends StatelessWidget {
   const _ActionRow({
+    super.key,
     required this.icon,
     required this.title,
     required this.subtitle,

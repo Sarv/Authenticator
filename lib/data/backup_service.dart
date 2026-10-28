@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -39,11 +40,13 @@ class BackupService {
   }
 
   /// Opens the system share sheet for the backup file at [path] so the user
-  /// can save or send it.
-  Future<void> share(String path) async {
+  /// can save or send it. [origin] is the global rect of the control that
+  /// opened it: iOS anchors the sheet there and rejects the share without it.
+  Future<void> share(String path, {required Rect origin}) async {
     await Share.shareXFiles(
       [XFile(path, mimeType: 'application/json')],
       subject: 'Sarv OTP backup',
+      sharePositionOrigin: origin,
     );
   }
 
