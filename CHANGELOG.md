@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- "Go back" on the scanner's camera-unavailable screen now works; the QR frame was drawn over the button and swallowed the tap.
+- Exporting an encrypted backup now shows a loader while the backup is encrypted, instead of a pause with no feedback before the share sheet opens.
+- Importing a backup now shows a loader while it is decrypted and saved, until the result or an error appears.
+
 ## [0.1.2] - 2026-10-26
 
 ### Changed
