@@ -9,10 +9,23 @@ import 'ui/auth_gate.dart';
 import 'ui/home_screen.dart';
 import 'ui/theme.dart';
 
+// Shows app-wide messages that don't belong to any one screen.
+final _messenger = GlobalKey<ScaffoldMessengerState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Block screenshots / screen recording of 2FA codes (like Google Authenticator).
-  await enableSecureDisplay();
+  // Block screenshots / screen recording of 2FA codes. iOS still takes the
+  // (blank) screenshot, so say why it came out empty.
+  await enableSecureDisplay(
+    switcherCover: AppTokens.light.brand,
+    onScreenshot: () => _messenger.currentState
+      ?..clearSnackBars()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Screenshots are blocked to protect your codes'),
+        ),
+      ),
+  );
   final store = AccountStore();
   final theme = ThemeController();
   // Paint the first frame (splash -> lock screen) immediately. The Keystore read
@@ -43,6 +56,7 @@ class SarvOtpApp extends StatelessWidget {
       animation: theme,
       builder: (context, _) => MaterialApp(
         title: 'Sarv OTP',
+        scaffoldMessengerKey: _messenger,
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(AppTokens.light, Brightness.light),
         darkTheme: buildAppTheme(AppTokens.dark, Brightness.dark),

@@ -28,8 +28,9 @@ dependencies:
   path_provider: ^2.1.4
   share_plus: ^10.1.2
   file_picker: ^8.1.4
-  # Note: screenshot/recording blocking is enforced natively via FLAG_SECURE in
-  # MainActivity (see android/.../MainActivity.kt), not a Flutter plugin.
+  # Note: screenshot/recording blocking is enforced natively, not by a Flutter
+  # plugin: FLAG_SECURE in MainActivity.kt (Android) and SecureDisplay in
+  # AppDelegate.swift (iOS).
 
 dev_dependencies:
   flutter_test:
