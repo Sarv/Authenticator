@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +13,8 @@ import 'package:sarv_authenticator/ui/theme.dart';
 
 /// App lock with scripted answers, so Settings needs no platform calls.
 /// [authenticateResult] is what the biometric prompt returns; each prompt is
-/// counted in [authenticateCalls].
+/// counted in [authenticateCalls]. Set [heldPrompt] to keep the prompt open
+/// until the test completes it.
 class FakeLock implements AppLock {
   FakeLock({
     this.available = false,
@@ -23,6 +26,10 @@ class FakeLock implements AppLock {
   bool enabled;
   bool authenticateResult;
   int authenticateCalls = 0;
+  Completer<bool>? heldPrompt;
+
+  @override
+  bool isPrompting = false;
 
   @override
   Future<bool> get isAvailable async => available;
@@ -37,7 +44,12 @@ class FakeLock implements AppLock {
   @override
   Future<bool> authenticate() async {
     authenticateCalls++;
-    return authenticateResult;
+    isPrompting = true;
+    try {
+      return await (heldPrompt?.future ?? Future.value(authenticateResult));
+    } finally {
+      isPrompting = false;
+    }
   }
 }
 
