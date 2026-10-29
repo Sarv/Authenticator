@@ -13,6 +13,12 @@ class AppLock {
   static const _delayKey = 'sarv_authenticator.lock_delay_seconds.v1';
   final LocalAuthentication _auth;
   final FlutterSecureStorage _storage;
+  bool _prompting = false;
+
+  /// True while a biometric / device-credential prompt is on screen. The prompt
+  /// moves the app to inactive (and on Android paused), which must not be read
+  /// as the user leaving the app.
+  bool get isPrompting => _prompting;
 
   /// Whether the device can actually do biometrics / PIN / pattern.
   Future<bool> get isAvailable async {
@@ -71,6 +77,7 @@ class AppLock {
 
   /// Prompts for biometrics / device credential. Returns true on success.
   Future<bool> authenticate() async {
+    _prompting = true;
     try {
       return await _auth.authenticate(
         localizedReason: 'Unlock Sarv OTP to view your codes',
@@ -81,6 +88,8 @@ class AppLock {
     } catch (error, stack) {
       debugPrint('AppLock.authenticate failed: $error\n$stack');
       return false;
+    } finally {
+      _prompting = false;
     }
   }
 }

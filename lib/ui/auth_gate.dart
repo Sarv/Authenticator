@@ -1,6 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../data/app_lock.dart';
 import 'lock_screen.dart';
+
+/// Whether [state] means the user has left the app, so the auto-lock clock
+/// starts. Android reports the recent-apps screen as paused/hidden, but iOS
+/// reports its app switcher as `inactive` only — so on iOS `inactive` counts
+/// too, or the app would come back from the switcher unlocked. On Android
+/// `inactive` is transient (notification shade, permission dialog) and ignored.
+bool startsAutoLockClock(AppLifecycleState state, TargetPlatform platform) =>
+    state == AppLifecycleState.paused ||
+    state == AppLifecycleState.hidden ||
+    (platform == TargetPlatform.iOS && state == AppLifecycleState.inactive);
 
 /// Gates [child] behind the biometric lock. Prompts on first launch and, when
 /// the app is backgrounded longer than the configured auto-lock delay, re-locks
@@ -46,17 +57,13 @@ class _AuthGateState extends State<AuthGate> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // The biometric prompt itself pushes our Activity to inactive/paused. If we
-    // treated that as a real backgrounding we would re-lock the moment auth
-    // succeeds and loop forever, so ignore all lifecycle changes while a prompt
-    // is on screen.
-    if (_authenticating) return;
+    // A biometric prompt — ours or the Settings lock toggle's — pushes the app
+    // to inactive/paused. If we treated that as a real backgrounding we would
+    // re-lock the moment auth succeeds and loop forever, so ignore all
+    // lifecycle changes while a prompt is on screen.
+    if (_authenticating || widget.lock.isPrompting) return;
 
-    // Only a genuine background (app switched away / screen off) counts. `inactive`
-    // fires for transient things — the app switcher peek, the notification shade,
-    // a permission dialog — and must not start the auto-lock clock.
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
+    if (startsAutoLockClock(state, defaultTargetPlatform)) {
       _backgroundedAt ??= DateTime.now();
     } else if (state == AppLifecycleState.resumed) {
       _maybeLockOnResume();
