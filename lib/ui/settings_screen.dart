@@ -63,15 +63,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _toggle(bool value) async {
-    // When turning the lock ON, confirm the user can actually authenticate so
-    // they can't lock themselves out with a credential that doesn't work.
+    // Authenticate both ways: turning the lock ON proves the credential works,
+    // so the user can't lock themselves out; turning it OFF proves it is the
+    // owner, so someone holding an unlocked phone can't remove the protection.
     setState(() => _saving = true);
-    if (value) {
-      final ok = await widget.lock.authenticate();
-      if (!ok) {
-        if (mounted) setState(() => _saving = false);
-        return;
-      }
+    final ok = await widget.lock.authenticate();
+    if (!ok) {
+      if (mounted) setState(() => _saving = false);
+      return;
     }
     await widget.lock.setEnabled(value);
     if (!mounted) return;
