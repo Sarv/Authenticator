@@ -61,10 +61,11 @@ class SarvOtpApp extends StatelessWidget {
         theme: buildAppTheme(AppTokens.light, Brightness.light),
         darkTheme: buildAppTheme(AppTokens.dark, Brightness.dark),
         themeMode: theme.mode,
-        home: AuthGate(
-          lock: lock,
-          child: HomeScreen(store: store, lock: lock, theme: theme),
-        ),
+        // The gate wraps the Navigator, not the home route, so the lock screen
+        // also covers Settings, the scanner and any dialog pushed on top.
+        builder: (context, navigator) =>
+            AuthGate(lock: lock, child: navigator!),
+        home: HomeScreen(store: store, lock: lock, theme: theme),
       ),
     );
   }
