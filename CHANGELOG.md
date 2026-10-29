@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - iOS now blocks screenshots and screen recordings of codes, matching Android: captures come out black, the app explains why after a screenshot, and codes are hidden in the app switcher. Previously iOS had no capture protection at all.
 - Turning the app lock off now requires fingerprint, face or device PIN, just like turning it on, so someone holding an unlocked phone can't remove the protection.
+- On iOS, returning from the App Switcher now asks to unlock again, the same as returning from the home screen. Before, the app came back unlocked even with "Immediately" auto-lock selected. Android already behaved this way.
+- The lock screen now also covers Settings, the scanner and open dialogs. Before, if the app re-locked while one of those was open, it stayed usable and backup export could be reached without unlocking.
 
 ## [0.1.2] - 2026-10-26
 
