@@ -55,6 +55,17 @@ a.btn:hover { text-decoration: none; }
 .theme-seg { display: inline-flex; }
 .hero .hint { margin-top: var(--space-3); }
 
+/* Feature banner — full content width, scales down on narrow screens */
+.feature-banner { margin: var(--space-8) 0 0; }
+.feature-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
 /* Screenshots — a horizontal strip that scrolls inside itself on narrow screens */
 .shots {
   display: flex;
