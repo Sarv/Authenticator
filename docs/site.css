@@ -42,6 +42,10 @@ p  { margin: 0; }
    as a stray text link on anchors styled as buttons. */
 a.btn:hover { text-decoration: none; }
 
+/* Theme switcher (sarv_theme .seg) pinned top-right of the page. */
+.topbar { display: flex; justify-content: flex-end; margin: calc(-1 * var(--space-7)) 0 var(--space-6); }
+.theme-seg { display: inline-flex; }
+
 .hero .hint { margin-top: var(--space-3); }
 
 /* Feature banner — full content width, scales down on narrow screens */
