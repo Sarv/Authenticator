@@ -33,8 +33,23 @@
     };
     applyTheme();
     darkQuery.addEventListener('change', applyTheme);
+    // Screenshot strips: one per platform, starting on the visitor's own.
+    const showPlatform = (platform) => {
+      document.querySelectorAll('.shots[data-platform]').forEach((strip) => {
+        strip.hidden = strip.dataset.platform !== platform;
+      });
+      document.querySelectorAll('.platform-seg .seg-btn').forEach((button) => {
+        const on = button.dataset.platform === platform;
+        button.classList.toggle('is-on', on);
+        button.setAttribute('aria-checked', String(on));
+      });
+    };
     document.addEventListener('DOMContentLoaded', () => {
       applyTheme();
+      showPlatform(/android/i.test(navigator.userAgent) ? 'android' : 'ios');
+      document.querySelectorAll('.platform-seg .seg-btn').forEach((button) => {
+        button.addEventListener('click', () => showPlatform(button.dataset.platform));
+      });
       document.querySelectorAll('.theme-seg .seg-btn').forEach((button) => {
         button.addEventListener('click', () => {
           themeChoice = button.dataset.theme;
@@ -93,12 +108,29 @@
       <img src="assets/feature-banner.jpg" width="1024" height="500" alt="Sarv OTP: secure all your accounts in one place. Generate 2FA codes quickly and securely; your data stays on your device." />
     </figure>
 
-    <section class="shots" aria-label="Screenshots">
-      <figure><img src="screenshots/01-home-light.png" alt="Home screen with rolling codes, light theme" loading="lazy" /><figcaption>Your codes</figcaption></figure>
-      <figure><img src="screenshots/02-home-dark.png" alt="Home screen, dark theme" loading="lazy" /><figcaption>Dark theme</figcaption></figure>
-      <figure><img src="screenshots/04-add-light.png" alt="Add account: scan a QR code or enter a key" loading="lazy" /><figcaption>Scan or type a key</figcaption></figure>
-      <figure><img src="screenshots/03-settings-light.png" alt="Settings: theme, app lock and encrypted backup" loading="lazy" /><figcaption>App lock &amp; backup</figcaption></figure>
-      <figure><img src="screenshots/06-swipe-light.png" alt="Swiping a row reveals edit and delete" loading="lazy" /><figcaption>Swipe to edit</figcaption></figure>
+    <section class="shots-section" aria-label="Screenshots">
+      <div class="shots-switch">
+        <div class="seg platform-seg" role="radiogroup" aria-label="Show screenshots for">
+          <button class="seg-btn is-on" type="button" role="radio" aria-checked="true" data-platform="ios">iPhone</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-platform="android">Android</button>
+        </div>
+      </div>
+      <div class="shots" data-platform="ios">
+        <figure><img src="screenshots/ios/1.jpg" alt="Your codes: every account in one list with rolling 2FA codes" loading="lazy" /></figure>
+        <figure><img src="screenshots/ios/2.jpg" alt="Light and dark mode side by side" loading="lazy" /></figure>
+        <figure><img src="screenshots/ios/3.jpg" alt="Settings: theme, app lock and encrypted backup" loading="lazy" /></figure>
+        <figure><img src="screenshots/ios/4.jpg" alt="Add an account by scanning a QR code or entering a setup key" loading="lazy" /></figure>
+        <figure><img src="screenshots/ios/5.jpg" alt="Rename or remove an account from its menu" loading="lazy" /></figure>
+        <figure><img src="screenshots/ios/6.jpg" alt="Swipe an account to edit it" loading="lazy" /></figure>
+      </div>
+      <div class="shots" data-platform="android" hidden>
+        <figure><img src="screenshots/android/1.jpg" alt="Your codes: every account in one list with rolling 2FA codes" loading="lazy" /></figure>
+        <figure><img src="screenshots/android/2.jpg" alt="Light and dark mode side by side" loading="lazy" /></figure>
+        <figure><img src="screenshots/android/3.jpg" alt="Settings: theme, app lock and encrypted backup" loading="lazy" /></figure>
+        <figure><img src="screenshots/android/4.jpg" alt="Add an account by scanning a QR code or entering a setup key" loading="lazy" /></figure>
+        <figure><img src="screenshots/android/5.jpg" alt="Rename or remove an account from its menu" loading="lazy" /></figure>
+        <figure><img src="screenshots/android/6.jpg" alt="Swipe an account to edit it" loading="lazy" /></figure>
+      </div>
     </section>
 
     <section class="section">
