@@ -10,15 +10,56 @@
   <link rel="stylesheet" href="assets/sarv_theme/design-system.css" />
   <link rel="stylesheet" href="site.css" />
   <script>
-    // The design system flips to dark via the .dark class; follow the OS setting.
+    // The design system flips to dark via the .dark class. The visitor's choice
+    // (light / dark) wins; "system" follows the OS. Runs before paint so the
+    // page never flashes the wrong theme. Storage can be blocked (private mode),
+    // so the choice also lives in memory for this visit.
     const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const applyTheme = () => document.documentElement.classList.toggle('dark', darkQuery.matches);
+    let themeChoice = (() => {
+      try { return localStorage.getItem('sarv-otp-theme') ?? 'system'; } catch { return 'system'; }
+    })();
+    const applyTheme = () => {
+      const dark = themeChoice === 'dark' || (themeChoice === 'system' && darkQuery.matches);
+      document.documentElement.classList.toggle('dark', dark);
+      document.querySelectorAll('.theme-seg .seg-btn').forEach((button) => {
+        const on = button.dataset.theme === themeChoice;
+        button.classList.toggle('is-on', on);
+        button.setAttribute('aria-checked', String(on));
+      });
+    };
     applyTheme();
     darkQuery.addEventListener('change', applyTheme);
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTheme();
+      document.querySelectorAll('.theme-seg .seg-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+          themeChoice = button.dataset.theme;
+          try { localStorage.setItem('sarv-otp-theme', themeChoice); } catch { /* remembered for this visit only */ }
+          applyTheme();
+        });
+      });
+    });
   </script>
 </head>
 <body>
   <main class="site">
+
+    <div class="topbar">
+      <div class="seg theme-seg" role="radiogroup" aria-label="Theme">
+        <button class="seg-btn" type="button" role="radio" data-theme="system">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+          System
+        </button>
+        <button class="seg-btn" type="button" role="radio" data-theme="light">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>
+          Light
+        </button>
+        <button class="seg-btn" type="button" role="radio" data-theme="dark">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 14A8 8 0 1110 4a7 7 0 0010 10z"/></svg>
+          Dark
+        </button>
+      </div>
+    </div>
 
     <header class="hero">
       <img class="hero-icon" src="assets/authenticator-icon.svg" alt="" width="88" height="88" />
@@ -32,13 +73,13 @@
       </p>
 
       <div class="store-row">
-        <a class="btn btn-primary btn-lg store-btn" href="https://play.google.com/store/apps/details?id=com.sarv.otp" target="_blank" rel="noopener">
+        <a class="btn btn-lg store-btn store-live" href="https://play.google.com/store/apps/details?id=com.sarv.otp" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3.5v17l9.2-8.5L4 3.5Zm10.6 7.2 2.7-2.5L6.6 2.4l8 8.3Zm0 2.6-8 8.3 10.7-5.8-2.7-2.5Zm4.2-3.9L16 11.9l2.8 2.6 2.2-1.2c.7-.4.7-1.2 0-1.6l-2.2-1.2Z" fill="currentColor"/></svg>
           <span class="store-text"><small>Get it on</small>Google Play</span>
         </a>
         <button class="btn btn-secondary btn-lg store-btn" disabled aria-disabled="true">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9ZM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4Z" fill="currentColor"/></svg>
-          <span class="store-text"><small>Download on the</small>App Store</span>
+          <span class="store-text"><small>Coming soon to the</small>App Store</span>
         </button>
       </div>
       <p class="hint">Now on Google Play. The App Store listing is coming soon — meanwhile, iPhone builds ship through TestFlight.</p>
