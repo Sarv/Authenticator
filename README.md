@@ -36,10 +36,12 @@ Long-press a row for the actions menu; swipe to edit or delete:
 
 Download links for every platform are on the [Sarv OTP website](https://sarv.github.io/OTP/).
 
-- **Android** — grab the signed `.apk` from the
-  [latest release](https://github.com/Sarv/OTP/releases) and sideload
-  it (the one-time "allow unknown apps" prompt is a property of installing outside
-  the Play Store, not a warning about the app). See [RELEASING.md](RELEASING.md).
+- **Android** — install from
+  [Google Play](https://play.google.com/store/apps/details?id=com.sarv.otp), or grab
+  the signed `.apk` from the [latest release](https://github.com/Sarv/OTP/releases)
+  and sideload it (the one-time "allow unknown apps" prompt is a property of
+  installing outside the Play Store, not a warning about the app). See
+  [RELEASING.md](RELEASING.md).
 - **iOS** — distributed through **TestFlight / the App Store**; iOS has no
   sideloadable equivalent of an APK. See [RELEASING-iOS.md](RELEASING-iOS.md) for
   the signing and submission setup.
