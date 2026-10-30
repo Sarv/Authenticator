@@ -30,29 +30,18 @@ p  { margin: 0; }
   gap: var(--space-3);
   margin-top: var(--space-7);
 }
-/* Store buttons need a two-line label, so they are taller than .btn-lg's 44px. */
-.store-btn { height: 52px; min-width: 180px; }
-.store-btn svg { width: 24px; height: 24px; flex-shrink: 0; }
-.store-text { display: flex; flex-direction: column; align-items: flex-start; line-height: var(--lh-tight); }
-.store-text small { font-size: var(--fs-xs); font-weight: var(--fw-medium); opacity: 0.75; }
+/* Official store badges (Apple / Google artwork, used unaltered). Both are
+   black with a grey keyline, so they read on the light and dark themes alike. */
+.store-badge { position: relative; display: inline-flex; border-radius: var(--r-md); }
+.store-badge img { display: block; height: 52px; width: auto; }
+.store-badge:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.store-soon { cursor: default; }
+.store-soon .badge { position: absolute; bottom: calc(100% + var(--space-1)); right: 0; } /* sits above, never over, the badge artwork */
 
 /* Local override: the design system underlines every <a> on hover, which reads
    as a stray text link on anchors styled as buttons. */
 a.btn:hover { text-decoration: none; }
 
-/* A live store link is drawn like the official store badges: solid ink with
-   inverted text, which flips cleanly between themes. White-on-brand loses
-   contrast in dark mode, where --brand is a light blue. */
-.store-live { background: var(--ink); color: var(--bg); box-shadow: var(--shadow-sm); }
-.store-live:hover { background: var(--ink-2); }
-
-/* A store that isn't live yet: an outline placeholder rather than the faded
-   .btn:disabled look, which turned muddy in dark mode. */
-.store-btn:disabled { opacity: 1; border-style: dashed; color: var(--muted); background: transparent; }
-
-/* Theme switcher (sarv_theme .seg) pinned top-right of the page. */
-.topbar { display: flex; justify-content: flex-end; margin: calc(-1 * var(--space-7)) 0 var(--space-6); }
-.theme-seg { display: inline-flex; }
 .hero .hint { margin-top: var(--space-3); }
 
 /* Feature banner — full content width, scales down on narrow screens */
