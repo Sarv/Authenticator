@@ -13,7 +13,9 @@ p  { margin: 0; }
 
 /* Hero */
 .hero { text-align: center; }
-.hero-icon { border-radius: var(--r-xl); box-shadow: var(--shadow-md); }
+/* app-icon.svg carries its own white ground with corners at 22.5% of its size,
+   so the shadow follows that curve rather than a fixed --r-* radius. */
+.hero-icon { border-radius: 22.5%; box-shadow: var(--shadow-md); }
 .hero h1 { font-size: var(--fs-4xl); font-weight: var(--fw-black); margin-top: var(--space-5); }
 .hero-tagline { font-size: var(--fs-xl); font-weight: var(--fw-semi); color: var(--brand); margin-top: var(--space-2); }
 .hero-lede {
