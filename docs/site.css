@@ -63,8 +63,6 @@ a.btn:hover { text-decoration: none; }
 
 /* Screenshots — a horizontal strip that scrolls inside itself on narrow screens */
 .shots-section { margin-top: var(--space-9); }
-.shots-switch { display: flex; justify-content: center; margin-bottom: var(--space-4); }
-.platform-seg { display: inline-flex; }
 .shots {
   display: flex;
   gap: var(--space-4);
@@ -73,7 +71,6 @@ a.btn:hover { text-decoration: none; }
   overflow-x: auto;
   scroll-snap-type: x mandatory;
 }
-.shots[hidden] { display: none; }
 .shots figure { margin: 0; flex: 0 0 140px; scroll-snap-align: center; text-align: center; }
 .shots img {
   width: 100%;
